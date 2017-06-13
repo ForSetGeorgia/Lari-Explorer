@@ -22,9 +22,10 @@ Look at the Gemfile for a complete list.
 
 Environment variables
 You will need the following [Environment Variables](https://help.ubuntu.com/community/EnvironmentVariables) set.
-* APPLICATION_FROM_EMAIL - email address to send all emails from
-* APPLICATION_FROM_PWD - password of above email address
-* APPLICATION_ERROR_TO_EMAIL - email address to send application errors to
+* APPLICATION_FEEDBACK_FROM_EMAIL - email address to send all emails from
+* APPLICATION_FEEDBACK_FROM_PWD - password of above email address
+* APPLICATION_EMAIL_SMTP_ADDRESS - email smtp address
+* APPLICATION_FEEDBACK_TO_EMAIL - email address to send application errors to
 * DEV_FACEBOOK_APP_ID - Facebook is one of the options for logging in to the system and you must have an app account created under facebook developers. This key is for use on development/testing sites. This key stores the application id. (optional)
 * DEV_FACEBOOK_APP_SECRET - This key stores the facebook application secret for development/testing sites. (optional)
 * FACEBOOK_APP_ID - Facebook is one of the options for logging in to the system and you must have an app account created under facebook developers. This key is for use on production sites. This key stores the application id. (optional)

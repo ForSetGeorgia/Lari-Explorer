@@ -1,11 +1,13 @@
 source 'https://rubygems.org'
 
+ruby "2.1.2"
+
 gem 'bundler'
 gem "rails", "3.2.18"
-gem "mysql2", "~> 0.3.16" # this gem works better with utf-8
+gem "mysql2", "~> 0.3.21" # this gem works better with utf-8
 
 gem "json"
-gem "jquery-rails", '~> 3.1.0' #"~> 1.0.19" 
+gem "jquery-rails", '~> 3.1.0' #"~> 1.0.19"
 gem "devise", "~> 2.0.4" # user authentication
 gem 'omniauth' # to login via facebook
 gem 'omniauth-facebook' # to login via facebook
@@ -32,6 +34,8 @@ gem 'whenever' # schedule cron jobs
 gem 'gabba', '~> 1.0.1' # record api calls to google analytics
 gem "unidecoder", "~> 1.1.2" #convert utf8 to ascii for permalinks
 gem "mechanize"
+gem 'dotenv-rails', '~> 2.2', '>= 2.2.1' # environment variables
+
 # Gems used only for assets and not required
 # in production environments by default.
 group :assets do
@@ -42,12 +46,12 @@ group :assets do
   gem 'less-rails', git: 'git://github.com/metaskills/less-rails.git'
   gem 'twitter-bootstrap-rails', :git => 'git://github.com/seyhunak/twitter-bootstrap-rails.git'  , branch: 'bootstrap3'
   gem 'jquery-datatables-rails', '~> 3.1.1'
-  gem "jquery-ui-rails" , "~> 4.1.2"  
+  gem "jquery-ui-rails" , "~> 4.1.2"
 end
 
 
 group :development do
- 	gem "mailcatcher", "0.5.12" # small smtp server for dev, http://mailcatcher.me/
+ 	# gem "mailcatcher", "0.5.12" # small smtp server for dev, http://mailcatcher.me/
   gem 'rb-inotify', '~> 0.8.8' # rails dev boost needs this
   gem 'rails-dev-boost', :git => 'git://github.com/thedarkone/rails-dev-boost.git' # speed up loading page in dev mode
 end

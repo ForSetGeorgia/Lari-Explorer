@@ -47,7 +47,7 @@ BootstrapStarter::Application.configure do
 
   # Disable delivery errors, bad email addresses will be ignored
   config.action_mailer.raise_delivery_errors = false
-	config.action_mailer.default_url_options = { :host => 'dev-xrates.jumpstart.ge' }
+	config.action_mailer.default_url_options = { :host => 'dev-xrates.forset.ge' }
 	config.action_mailer.delivery_method = :smtp
 
   # Enable threaded mode
@@ -63,6 +63,6 @@ BootstrapStarter::Application.configure do
 	# options for exception notification gem
 	config.middleware.use ExceptionNotifier,
 		:email_prefix => "[Lari Explorer App Error (#{Rails.env})] ",
-    :sender_address => ENV['APPLICATION_FEEDBACK_FROM_EMAIL'],
-		:exception_recipients => [ENV['APPLICATION_ERROR_TO_EMAIL']]
+    :sender_address => [ENV['APPLICATION_ERROR_FROM_EMAIL']],
+    :exception_recipients => [ENV['APPLICATION_FEEDBACK_TO_EMAIL']]
 end
