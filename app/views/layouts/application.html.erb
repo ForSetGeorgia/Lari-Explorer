@@ -102,12 +102,12 @@
       <div class="box">
         <div class="share">
           <div><%= t('app.common.share') %></div>
-          <div class="addthis_sharing_toolbox"></div>
+          <div class="addthis_inline_share_toolbox"></div>
         </div>
         <div class="last-update"><%= t('app.common.last_update') %><span><%= "#{I18n.l @last_scrapped_at, format: :long}" %></span></div>
         <div class='powered-by'>
-          <%= link_to(image_tag("svg/js.svg"), "http://www.jumpstart.ge", :target => "_blank",
-              :title => t('app.common.js_link_title') ) %>
+          <%= link_to(image_tag("svg/forset.svg"), "https://forset.ge", :target => "_blank",
+              :title => t('app.common.logo_link_title') ) %>
         </div>
       </div>
     </div>
@@ -127,16 +127,14 @@
     <% end %>
 
 		<% if Rails.env.production? %>
-      <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-55373fab24a51695" async="async"></script>
+      <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-59b64c4f87a9da0c" async="async"></script>
+      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-100354106-4"></script>
       <script>
-        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments)};
+        gtag('js', new Date());
 
-        ga('create', 'UA-12801815-42', 'auto');
-        ga('send', 'pageview');
-
+        gtag('config', 'UA-100354106-4');
       </script>
 		<% end %>
 

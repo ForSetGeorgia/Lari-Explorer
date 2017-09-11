@@ -116,8 +116,8 @@ en:
     common:
       app_name: Lari Explorer
       added_on: "Added on: %{date}"
-      jumpstart: JumpStart Georgia
-      js_link_title: JumpStart Georgia - We communicate data better!
+      organization: JumpStart Georgia
+      logo_link_title: ForSet - Communicating With Data
       compare_to_other_banks: Compare to other banks
       buy: Buy
       sell: Sell

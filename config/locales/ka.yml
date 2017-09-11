@@ -116,8 +116,8 @@ ka:
     common:
       app_name: "ლარის გზამკვლევი"
       added_on: "დამატებულია: %{date}"
-      jumpstart: "ჯამპსტარტ ჯორჯია"
-      js_link_title: "ჯამპსტარტ ჯორჯია - ჩვენ გაწვდით მონაცემებს უკეთ!"
+      organization: "ფორსეტი"
+      logo_link_title: "ფორსეტი - კომუნიკაცია მონაცემებით"
       compare_to_other_banks: "სხვა ბანკებთან შედარება"
       buy: "ყიდვა"
       sell: "გაყიდვა"
