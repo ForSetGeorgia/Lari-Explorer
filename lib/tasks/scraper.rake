@@ -248,16 +248,30 @@ class Rates
         ssl: true },
       { name: "ProCredit Bank",
         id:6,
-        path:"http://www.procreditbank.ge/",
-        parent_tag: lambda { |page|
-          return page.css('tr#right_table1 td.valuta').first.parent.parent.css("> tr")
-        },
-        child_tag:"td",
+        path:"https://www.procreditbank.ge/ge/exchange",
+        parent_tag: '.exchange-oficial-rates-bl .exchange-items article.exchange-item > div',
+        child_tag: "> div",
         child_tag_count:3,
         position:[0, 1, 2],
-        threshold: 3,
-        cnt:0 },
-
+        threshold: 5,
+        cnt:0,
+        script: true,
+        script_callback: lambda {|script, bank|
+          items = []
+          script.each do |item|
+            c = item.css(bank[:child_tag])
+            curs = ['usa', 'euro', 'eng', 'rus', 'swd']
+            curs_map = {'usa' => 'USD', 'euro' => 'EUR', 'eng' => 'GBP', 'rus' => 'RUB', 'swd' => 'CHF'}
+            if c.length == bank[:child_tag_count]
+              tmp = c[0].css("img").attr("src").value.gsub('/sites/all/themes/custom/procredit/images/exchange-currencu-','').gsub('.png','')
+              if curs.index(tmp).present?
+                items.push([swap(curs_map[tmp]), n(c[bank[:position][1]].text), n(c[bank[:position][2]].text)])
+              end
+            end
+          end
+          return items
+        }
+      },
       { name: "Cartu Bank",
         id:7,
         path:"http://www.cartubank.ge/?lng=eng",
@@ -527,7 +541,7 @@ class Rates
         child_tag_count:0,
         position:[0, 0, 0],
         threshold: 9,
-        exclude: ["AZN"], # when currency is temporarily unavailable key: zero, "0" , "AMD"
+        #exclude: ["AZN"], # when currency is temporarily unavailable key: zero, "0" , "AMD"
         cnt:0,
         script: true,
         script_callback: lambda {|script, bank|
@@ -549,7 +563,7 @@ class Rates
         child_tag:"th, td",
         child_tag_count:3,
         position:[0, 1, 2],
-        threshold: 5,
+        threshold: 6,
         cnt:0 },
       { name: "Bonaco Microfinance Organization",
         id:21,
