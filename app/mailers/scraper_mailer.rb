@@ -1,6 +1,6 @@
 class ScraperMailer < ActionMailer::Base
    default :from => ENV['APPLICATION_FEEDBACK_FROM_EMAIL']
-   default :to => ENV['APPLICATION_ERROR_TO_EMAIL']
+   default :to => ENV['APPLICATION_FEEDBACK_FROM_EMAIL']
 
    # def banks_failed(failed_banks)
    #    mail(subject: "Lari Application Scrapper Failed (#{Rails.env})",
