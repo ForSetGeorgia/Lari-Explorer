@@ -23,24 +23,30 @@ set :output, "log/cron.log"
 
 # scrape the bank websites
 # have to take into account the 4 hour time difference on production server
-every :day, :at => '4:15 am' do
-  rake "rates:scrape"
-end
-every :day, :at => '6:15 am' do
-  rake "rates:scrape"
-end
-every :day, :at => '8:15 am' do
-  rake "rates:scrape"
-end
-every :day, :at => '10:15 am' do
-  rake "rates:scrape"
-end
-every :day, :at => '12:15 am' do
-  rake "rates:scrape"
-end
-every :day, :at => '2:15 pm' do
-  rake "rates:scrape"
-end
-every :day, :at => '4:15 pm' do
+# every :day, :at => '4:15 am' do
+#   rake "rates:scrape"
+# end
+# every :day, :at => '6:15 am' do
+#   rake "rates:scrape"
+# end
+# every :day, :at => '8:15 am' do
+#   rake "rates:scrape"
+# end
+# every :day, :at => '10:15 am' do
+#   rake "rates:scrape"
+# end
+# every :day, :at => '12:15 am' do
+#   rake "rates:scrape"
+# end
+# every :day, :at => '2:15 pm' do
+#   rake "rates:scrape"
+# end
+# every :day, :at => '4:15 pm' do
+#   rake "rates:scrape"
+# end
+
+
+# At minute 15 past every hour from 8 through 20. 4-16 timezone difference
+every '15 4-16 * * *' do
   rake "rates:scrape"
 end

@@ -1,0 +1,20 @@
+all files are in datafiles/procredit/*
+
+# Scrape
+  https://apps.procreditbank.ge/CommertialExchangeRateHistory/Default.aspx
+  for any page to scrape choose 1(first) page
+  insert jquery into page
+  insert script from procredit_script.js
+  copy output procredit_data.txt
+  append INSERT INTO `tmp`(`code`, `date`, `buy`, `sell` ) VALUES
+  add ; at the end instead of ,
+  mysql restore
+  order tmp by date desc, code
+  export as csv procredit_2004-2017.10.31.csv
+  rates table copied as rates_orig and cleaned
+  WARNING fix fix:procredit to specify updated_at, created_at
+  call rake fix:procredit, specify path to csv correctly
+  get insert from rates without id
+  delete all rows from production rates where bank_id = 6 (procredit)
+  mysql restore
+  update rates set created_at = '2017-11-01 00:00:00', updated_at='2017-11-01 00:00:00' where bank_id = 6;
