@@ -8,6 +8,7 @@ gem "mysql2", "~> 0.3.21" # this gem works better with utf-8
 
 gem "json"
 gem "jquery-rails", '~> 3.1.0' #"~> 1.0.19"
+gem "select2-rails", "~> 4.0.3" # select2 dropdown
 gem "devise", "~> 2.0.4" # user authentication
 gem 'omniauth' # to login via facebook
 gem 'omniauth-facebook' # to login via facebook

@@ -125,6 +125,7 @@
     <% if I18n.locale == :ka %>
       <%= javascript_include_tag "datepicker-ka" %>
     <% end %>
+    <%= javascript_include_tag "select2_locale_#{I18n.locale}" %>
 
 		<% if Rails.env.production? %>
       <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-59b64c4f87a9da0c" async="async"></script>

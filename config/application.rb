@@ -60,10 +60,10 @@ module BootstrapStarter
     # compress all html/json responses
     config.middleware.use Rack::Deflater
 
-    config.assets.precompile += %w( admin.css api.css )    
-    config.assets.precompile += %w( admin.js api.js datepicker-ka.js root.js u.js )    
+    config.assets.precompile += %w( admin.css api.css )
+    config.assets.precompile += %w( admin.js api.js datepicker-ka.js root.js u.js select2_locale_ka.js )
 
-    config.assets.precompile += %w( shBrushJScript.js shCore.js tinymce/*)    
-    config.assets.precompile += %w( shCore.css shThemeDefault.css )    
+    config.assets.precompile += %w( shBrushJScript.js shCore.js tinymce/*)
+    config.assets.precompile += %w( shCore.css shThemeDefault.css )
   end
 end

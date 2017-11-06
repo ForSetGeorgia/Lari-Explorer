@@ -22,6 +22,7 @@ $(function () {
       if(href!="") window.location.href = href;
     }
   });
+  $.fn.select2.defaults.set('language', document.documentElement.lang);
   if(document.documentElement.lang == "ka")
   {
     Highcharts.setOptions({
@@ -178,21 +179,14 @@ $(function () {
     };
 
 
-
-
-
-  $("select#convertor_from").select2({ maximumSelectionSize: 5,
-    formatResult: function (d){
-      return "<div class='flag'><img src='/assets/png/flags/"+d.id+".png'/></div><div class='abbr'>"+d.id+"</div><div class='name'>"+d.text+"</div>";
-    },
-    formatSelection: function (d)
-    {
-      return "<div title='"+d.text+"'>"+d.id+"</div>";
-    },
-    matcher: function (term, text, opt) { return text.toUpperCase().indexOf(term.toUpperCase())>=0 || opt.val().toUpperCase().indexOf(term.toUpperCase())>=0; },
-    // dropdownCssClass : 'dropdown-width-small',
-    dropdownAutoWidth : true,
-    width: "auto"
+  $("select#convertor_from").select2({
+    maximumSelectionLength: 5,
+    dropdownAutoWidth: true,
+    // width: "auto",
+    // width: '100%',
+    templateResult: currencyTemplateResult,
+    templateSelection: currencyTemplateSelection,
+    matcher: matcherCallback
   }).on("change", function () {
     reconvert();
   });
@@ -201,7 +195,9 @@ $(function () {
   var convertor = $("#commercial_convertor .table"),
     convertor_input = $("#convertor_input"),
     convertor_to = $("#convertor_to"),
-    convertor_from = $("#s2id_convertor_from"),
+    swap_to_convertor = $("#swap_to_container"),
+    convertor_from = $("#convertor_from"),
+    swap_from_convertor = $("#swap_from_container"),
     convertor_date = $("#convertor_date"),
     buying_label = $("#buying_label"),
     convertor_heading = convertor.find(".row.heading"),
@@ -210,9 +206,10 @@ $(function () {
     convertor_swapped = false;
 
   function reconvert () {
+
     var c_date = convertor_date.datepicker("getDate"),
       c_amount = +convertor_input.val(),
-      c_cur = convertor_from.select2("val"),
+      c_cur = convertor_from.val(),
       key = c_cur + "_" + c_date, list, bnk, ln, rate_x, tmp, c_date_tmp;
     c_date = new Date(Date.UTC(c_date.getFullYear(), c_date.getMonth(), c_date.getDate())).getTime();
     if(isNaN(c_amount)) { c_amount = 1; }
@@ -221,9 +218,11 @@ $(function () {
       tmp = gon.currencies.filter(function (r){ return r[0] === c_cur; });
     }
     convertor.toggleClass("hide_rates", (c_amount === 1));
+    console.log(c_date, c_amount, c_cur, key, c_date)
     buying_label.text(c_amount === 1 ? gon.buying.replace("%{currency}", (typeof tmp === "undefined" ? gon.gel : tmp[0][1])) : gon.amount);
 
     function render () {
+      console.log('render')
       convertor.find("> .bank").remove();
       list = data.convertor.rates[key].filter(function (r){ return r.rate_type === (convertor_swapped ? "sell" : "buy"); }).sort(function (a, b) { return a.data[0][1] - b.data[0][1]; });
       ln = list.length;
@@ -254,6 +253,7 @@ $(function () {
     if(data.convertor.keys.indexOf(key) !== -1) { render(); }
     else
     {
+      console.log('remote')
       $.getJSON("/" + I18n.locale + "/api/v1/commercial_bank_rates?currency=" + c_cur + "&start_date=" + c_date + "&end_date=" + (c_date+86399999) + "&flat_ratio=true", function (d) {
         if(d.valid)
         {
@@ -289,8 +289,10 @@ $(function () {
   convertor_input.on("propertychange keyup input cut paste", function () { debounce(convertor_process(), 500); });
 
   $("#convertor_swap").click(function (){
-    convertor_from.detach().appendTo(convertor_swapped ? convertor_from_parent : convertor_to_parent).toggleClass("swapped");
-    convertor_to.detach().appendTo(convertor_swapped ? convertor_to_parent : convertor_from_parent).toggleClass("swapped");
+    var from = swap_from_convertor.children().detach()
+    var to = swap_to_convertor.children().detach()
+    from.appendTo(convertor_swapped ? swap_from_convertor : swap_to_convertor).toggleClass("swapped");
+    to.appendTo(convertor_swapped ? swap_to_convertor : swap_from_convertor).toggleClass("swapped");
     convertor_swapped = !convertor_swapped;
     reconvert();
   });
@@ -299,7 +301,16 @@ $(function () {
 
 
 
-
+function formatState (state) {
+  if (!state.id) {
+    return state.text;
+  }
+  var baseUrl = "/user/pages/images/flags";
+  var $state = $(
+    '<span><img src="' + baseUrl + '/' + state.element.value.toLowerCase() + '.png" class="img-flag" /> ' + state.text + '</span>'
+  );
+  return $state;
+};
 
 
   $(".tab[data-id] a").click(function (e){
@@ -319,31 +330,20 @@ $(function () {
     $("meta[name=description]").attr("content", descr);
     $("meta[property='og:description']").attr("content", descr);
   });
-
-  $("select.filter-b-currency").select2({ maximumSelectionSize: 5,
+  $("select.filter-b-currency").select2({ maximumSelectionLength: 5,
     // width:380,
-    formatResult: function (d){
-      return "<div class='flag'><img src='/assets/png/flags/"+d.id+".png'/></div><div class='abbr'>"+d.id+"</div><div class='name'>"+d.text+"</div>";
-    },
-    formatSelection: function (d)
-    {
-      return "<div title='"+d.text+"'>"+d.id+"</div>";
-    },
-    matcher: function (term, text, opt) { return text.toUpperCase().indexOf(term.toUpperCase())>=0 || opt.val().toUpperCase().indexOf(term.toUpperCase())>=0; }
+    templateResult: currencyTemplateResult,
+    templateSelection: currencyTemplateSelection,
+    matcher: matcherCallback
   });
-  $("select.filter-c-currency").select2({ maximumSelectionSize: 1,
-    allowClear:false,
+  $("select.filter-c-currency").select2({
+    // maximumSelectionLength: 1,
+    // allowClear:false,
     /*width:380,*/
-    formatResult: function (d){
-      return "<div class='flag'><img src='/assets/png/flags/"+d.id+".png'/></div><div class='abbr'>"+d.id+"</div><div class='name'>"+d.text+"</div>";
-    },
-    formatSelection: function (d)
-    {
-      return "<div title='"+d.text+"'>"+d.id+"</div>";
-    },
-    matcher: function (term, text, opt) { return text.toUpperCase().indexOf(term.toUpperCase())>=0 || opt.val().toUpperCase().indexOf(term.toUpperCase())>=0; }
+    templateResult: currencyTemplateResult,
+    templateSelection: currencyTemplateSelection,
+    matcher: matcherCallback
   });
-
 
   $("#worth").focusout(function (){
     var t = $(this),
@@ -467,8 +467,8 @@ $(function () {
 
   $(".filter-c-currency").on("change", function (){
 
-    var c = $(this).select2("val");
-    var b = $("input.filter-c-bank").select2("val");
+    var c = $(this).val();
+    var b = $("select.filter-c-bank").val();
     var e = gon.currency_to_bank[c];
     var data = [];
     if(c.length > 0)
@@ -482,7 +482,7 @@ $(function () {
         });
       });
     }
-    $("input.filter-c-bank").select2("val", data);
+    $("select.filter-c-bank").val(data);
     c_chart_refresh();
   });
   $(".filter-b-currency").on("change", function (){ b_chart_refresh(); });
@@ -499,19 +499,20 @@ $(function () {
         if(params.p == "national_bank" && exist(params.c))
         {
           cur.p2.c = params.c;
-          $(".filter-b-currency").select2("val", cur.p2.c);
+          $(".filter-b-currency").val(cur.p2.c);
         }
         else if(params.p == "commercial_banks" && exist(params.c) && exist(params.b))
         {
           cur.p3.c = params.c;
           cur.p3.b = params.b;
-          $(".filter-c-currency").select2("val", cur.p3.c);
+          $(".filter-c-currency").val(cur.p3.c);
           $(".filter-c-bank").val(cur.p3.b);
         }
         $(".tab[data-id=" + params.p + "] a").trigger("click");
       }
     }
     else $(".tab[data-id=commercial_banks] a").trigger("click");
+
     prepare();
     calculate(true);
     b_chart();
@@ -521,8 +522,7 @@ $(function () {
   {
     c_filter_bank();
   }
-  function calculate (remote)
-  {
+  function calculate (remote) {
     $("#a_chart").addClass("loader");
     data.worth = getWorth();
     if(data.worth > 0)
@@ -610,6 +610,31 @@ $(function () {
     var t = parseFloat(worth.val().replace(/,|\s/g, ""));
     return isNaN(t) ? 0 : t;
   }
+
+  function currencyTemplateResult (d) {
+    if(d.loading) {
+      return $("<div class='name'>"+d.text+"</div>");
+    }
+    return $("<div class='flag'><img src='/assets/png/flags/"+d.id+".png'/></div><div class='abbr'>"+d.id+"</div><div class='name'>"+d.text+"</div>");
+  }
+  function currencyTemplateSelection (d) {
+    return $("<div title='"+d.text+"'>"+d.id+"</div>");
+  }
+  function matcherCallback(params, data) {
+    // If there are no search terms, return all of the data
+    if ($.trim(params.term) === '') { return data; }
+
+    // Do not display the item if there is no 'text' property
+    if (typeof data.text === 'undefined') { return null; }
+
+    var term = params.term.toUpperCase()
+    var text = data.text.toUpperCase()
+    var value = data.id.toUpperCase()
+
+    return text.indexOf(term)>=0 || value.indexOf(term)>=0 ? data : null;
+  }
+
+
 
   function a_chart (){
 
@@ -731,7 +756,7 @@ $(function () {
   var b_chart_colors = ["#1cbbb4", "#F47C7C", "#4997FF", "#be8ec0", "#8fc743"];
   function b_chart_refresh (first){
     var chart = $("#b_chart").addClass("loader").highcharts();
-    var c = $(".filter-b-currency").select2("val");
+    var c = $(".filter-b-currency").val();
     cur.p2.c.forEach(function (t){
       if(c.indexOf(t)==-1)
       {
@@ -918,8 +943,8 @@ $(function () {
   function c_chart_refresh (first, partial){ // currency, bank
     var chart = $("#c_chart").addClass("loader").highcharts();
 
-    var c = $(".filter-c-currency").select2("val");
-    var b = $(".filter-c-bank").select2("val");
+    var c = $(".filter-c-currency").val();
+    var b = $(".filter-c-bank").val();
 
     cur.p3.c = c;
     cur.p3.b = b;
@@ -997,8 +1022,7 @@ $(function () {
       $("#c_chart").removeClass("loader");
     }
   }
-  function c_chart_redraw (id)
-  {
+  function c_chart_redraw (id) {
     var chart = $("#c_chart").highcharts(),
       type = cur.p3.type,
       ids = [id+"_B", id+"_S"],
@@ -1202,69 +1226,84 @@ $(function () {
     c_chart_refresh(true);
   }
   function c_filter_bank (){
-    $("input.filter-c-bank").select2({
-      multiple:true,
-      maximumSelectionSize: 5,
-      width:380,
-      // placeholder:"asdfasdfsd",
-      // allowClear: true,
+    $.fn.select2.amd.require([
+        'select2/data/array',
+        'select2/utils'
+    ], function (ArrayData, Utils) {
+      function CustomData ($element, options) {
+          CustomData.__super__.constructor.call(this, $element, options);
+      }
 
-      formatResult: function (d){
-        if(typeof d.group !== "undefined" && d.group) {
-          return "<div class='select2-optgroup'>"+d.text+"</div>";
-        }
-        else {
-          return "<div class='logo vtop'><img src='/assets/png/banks/"+d.image+".jpg'/></div><div class='name vtop'>"+d.text+"</div>"; // <div class='abbr'>"+d.id+"</div>
-        }
-      },
-      formatSelection: function (d)
-      {
-        return "<div title='"+d.text+"' class='logo vtop'><img src='/assets/png/banks/"+d.image+".jpg'/></div>"; //"+d.id+" was replaced with image
-      },
-      query: function (query) {
-        var data = {results:
-          [
-            {group: true, text: gon.commercial_banks, children: []},
-            {group: true, text: gon.micro_finance, children: []}
-          ]
-        };
-        var c = $(".filter-c-currency").select2("val");
+      Utils.Extend(CustomData, ArrayData);
 
-        var term = query.term.toUpperCase();
-        var len = term.length;
-
-        var e = gon.currency_to_bank[c];
-        e.forEach(function (d, i){
-          gon.banks.forEach(function (dd, ii){
-            if(d == dd[0])
-            {
-              if(len == 0 || dd[1].toUpperCase().indexOf(term) >= 0 || dd[2].toUpperCase().indexOf(term) >= 0 ){
-                data.results[dd[4]].children.push({ id:dd[2], text:dd[1], image:dd[3]["data-image"] });
-              }
-            }
-          });
-        });
-        query.callback(data);
-      },
-      initSelection : function (element, callback) {
+      CustomData.prototype.current = function (callback) {
         var data = [];
-        var e = gon.currency_to_bank[$(".filter-c-currency").select2("val")];
+        var currentValues = this.$element.val();
+        var e = gon.currency_to_bank[$(".filter-c-currency").val()];
 
-        $(element.val().split(",")).each(function (i, d)
-        {
+        currentValues.forEach(function (d, i) {
           var b = null;
-          gon.banks.forEach(function (dd, ii){
-            if(d == dd[2] && e.indexOf(dd[0]) != -1)
-            {
-              data.push({ id:dd[2], text:dd[1], image:dd[3]["data-image"] });
+          gon.banks.forEach(function (bnk, ii){
+            if(d == bnk[2] && e.indexOf(bnk[0]) != -1) {
+              data.push({ id:bnk[2], text:bnk[1], image:bnk[3]["data-image"] });
             }
           });
         });
         callback(data);
       }
+
+
+
+      CustomData.prototype.query = function (params, callback) {
+        var data = {
+          results: [
+            { group: true, text: gon.commercial_banks, children: [] },
+            { group: true, text: gon.micro_finance, children: [] }
+          ]
+        };
+        var c = $(".filter-c-currency").val();
+        var term = params.hasOwnProperty('term') ? params.term.toUpperCase() : '';
+        var term_ln = term.length;
+        var e = gon.currency_to_bank[c];
+
+        e.forEach(function (d, i){
+          gon.banks.forEach(function (bnk, ii){
+            if(d == bnk[0])
+            {
+              if(term_ln == 0 || bnk[1].toUpperCase().indexOf(term) >= 0 || bnk[2].toUpperCase().indexOf(term) >= 0 ){
+                data.results[bnk[4]].children.push({ id: bnk[2], text: bnk[1], image: bnk[3]["data-image"] });
+              }
+            }
+          });
+        });
+
+        callback(data);
+      }
+
+      $("select.filter-c-bank").select2({
+        multiple:true,
+        maximumSelectionLength: 5,
+        // width:380,
+        width: '100%',
+        // dropdownAutoWidth: true,
+        dataAdapter: CustomData,
+        // placeholder:"asdfasdfsd",
+        // allowClear: true,
+
+        templateResult: function (d){
+          if(typeof d.group !== "undefined" && d.group) {
+            return $("<div class='select2-optgroup'>"+d.text+"</div>");
+          }
+          else {
+            return $("<div class='logo vtop'><img src='/assets/png/banks/"+d.image+".jpg'/></div><div class='name vtop'>"+d.text+"</div>");
+          }
+        },
+        templateSelection: function (d) {
+          return $("<div title='"+d.text+"'><img src='/assets/png/banks/"+d.image+".jpg'/></div>");
+        }
+      });
     });
-    $("input.filter-c-bank").on("change", function ()
-    {
+    $("select.filter-c-bank").on("change", function () {
       c_chart_refresh(false, true);
     });
   }

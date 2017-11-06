@@ -21,7 +21,7 @@
 //= require highcharts-exporting
 // require twitter/bootstrap/dropdown
 // require bootstrap-select.min
-//= require select2.min
+//= require select2
 // require dev
 //= require tab
 //= require_self
