@@ -205,10 +205,13 @@ $(function () {
     convertor_to_parent = convertor_to.parent(),
     convertor_swapped = false;
 
+  function clean_number(n) {
+    return typeof n === 'string' ? n.replace(',', '').replace(' ', '') : ''
+  }
   function reconvert () {
 
     var c_date = convertor_date.datepicker("getDate"),
-      c_amount = +convertor_input.val(),
+      c_amount = +clean_number(convertor_input.val()),
       c_cur = convertor_from.val(),
       key = c_cur + "_" + c_date, list, bnk, ln, rate_x, tmp, c_date_tmp;
     c_date = new Date(Date.UTC(c_date.getFullYear(), c_date.getMonth(), c_date.getDate())).getTime();
@@ -218,11 +221,11 @@ $(function () {
       tmp = gon.currencies.filter(function (r){ return r[0] === c_cur; });
     }
     convertor.toggleClass("hide_rates", (c_amount === 1));
-    console.log(c_date, c_amount, c_cur, key, c_date)
+    // console.log(c_date, c_amount, c_cur, key, c_date)
     buying_label.text(c_amount === 1 ? gon.buying.replace("%{currency}", (typeof tmp === "undefined" ? gon.gel : tmp[0][1])) : gon.amount);
 
     function render () {
-      console.log('render')
+      // console.log('render')
       convertor.find("> .bank").remove();
       list = data.convertor.rates[key].filter(function (r){ return r.rate_type === (convertor_swapped ? "sell" : "buy"); }).sort(function (a, b) { return a.data[0][1] - b.data[0][1]; });
       ln = list.length;
@@ -253,7 +256,7 @@ $(function () {
     if(data.convertor.keys.indexOf(key) !== -1) { render(); }
     else
     {
-      console.log('remote')
+      // console.log('remote')
       $.getJSON("/" + I18n.locale + "/api/v1/commercial_bank_rates?currency=" + c_cur + "&start_date=" + c_date + "&end_date=" + (c_date+86399999) + "&flat_ratio=true", function (d) {
         if(d.valid)
         {
@@ -266,7 +269,7 @@ $(function () {
   }
 
   function convertor_process () {
-    var t = convertor_input, v = +t.val(), prev = t.data("prev");
+    var t = convertor_input, v = +clean_number(t.val()), prev = t.data("prev");
     if(isNaN(v)) { v = 1; }
     if(v !== prev) {
       t.data("prev", v);
