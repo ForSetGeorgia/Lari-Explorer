@@ -341,6 +341,17 @@ class Api::V1Controller < ApplicationController
   end
 
 
+  def last_updated_date
+    last_updated_date = (Rate.maximum(:updated_at).to_f * 1000).to_i
+
+    data = { valid: false }
+    if (last_updated_date)
+      data = { valid: true, last_updated_date: last_updated_date }
+    end
+
+    render json: data, status: 200
+  end
+
 private
 
   # rails does not return the correct mime type for jsonp requests
