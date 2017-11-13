@@ -1785,4 +1785,73 @@ if v.present? && v.api_methods.empty?
   }
 }</pre>
 <p> </p>')
+  m = v.api_methods.create(permalink: 'last_updated_date', sort_order: 9, public: true)
+  m.api_method_translations.create(locale: 'en', title: 'Exchange Rates Last Updated Date', content: '<p>Get exchange rates last updated date</p>
+<h2>URL</h2>
+<p>To call this method, use an HTTP GET request to the following URL:</p>
+<div class="url">https://lari.forset.ge/[locale]/api/v1/last_updated_date</div>
+<p>where:</p>
+<ul class="list-unstyled">
+<li>[locale] = the locale of the language you want the data to be returned in (currently <strong>ka</strong> for Georgian or <strong>en</strong> for English)</li>
+</ul>
+<h2>Required Parameters</h2>
+<p>There are no required parameters for this call.</p>
+<h2>Optional Parameters</h2>
+<p>There are no optional parameters for this call.</p>
+<h2>What You Get</h2>
+<p>The return object is a JSON object with the following information:</p>
+<table class="table table-bordered table-hover table-nonfluid">
+<thead>
+<tr><th>Parameter</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr>
+<td>last_updated_date</td>
+<td>Exchange rates last updated date, in UTC format (e.g., 1422748800000 is the UTC date for 2015-01-01). <a href="http://www.w3schools.com/jsref/jsref_utc.asp" target="_blank">Go here for more information about UTC dates</a>.</td>
+</tr>
+</tbody>
+</table>
+<h2>Examples</h2>
+<h3>Example 1</h3>
+<p>Here is an example of getting last updated date. The URL for this is the following:</p>
+<div class="url"><a href="/en/api/v1/last_updated_date" target="_blank">https://lari.forset.ge/en/api/v1/last_updated_date</a></div>
+<pre class="brush:js;auto-links:false;toolbar:false;tab-size:2" contenteditable="false">{
+  valid: true,
+  last_updated_date: 1510205296000
+}</pre>
+<p>&nbsp;</p>')
+  m.api_method_translations.create(locale: 'ka', title: 'მონაცემების ბოლო განახლების თარიღი', content: '<p>გაცვლითი კურსის შესახებ ინფორმაციის ბოლო განახლების თარიღი.</p>
+<h2><strong>URL</strong></h2>
+<p>ამ მეთოდის გამოძახებისთვის გამოიყენეთ HTTP GET მოთხოვნა შემდეგი URL-ისთვის:</p>
+<div class="url">https://lari.forset.ge/[locale]/api/v1/last_updated_date</div>
+<p>სადაც:</p>
+<ul class="list-unstyled">
+<li>[locale] = ენა, რომელშიც გსურთ მონაცემების მიღება(ამ დროისთვის <strong>ka</strong> ქართულად ან <strong>en</strong> ინგლისურად)</li>
+</ul>
+<h2><strong>აუცილებელი პარამეტრები</strong></h2>
+<p>გამოძახებისთვის არ არის საჭირო აუცილებელი პარამეტრები.</p>
+<h2><strong>არჩევითი პარამეტრები</strong></h2>
+<p>გამოძახებისთვის არ არის საჭირო არჩევითი პარამეტრები.</p>
+<h2><strong>რას მიიღებთ</strong></h2>
+<p>დაბრუნებული JSON ობიექტი იქნება შემდეგი ინფორმაციით:</p>
+<table class="table table-bordered table-hover table-nonfluid">
+<thead>
+<tr><th>პარამეტრი</th><th>აღწერა</th></tr>
+</thead>
+<tbody>
+<tr>
+<td>last_updated_date</td>
+<td>გაცვლითი კურსის შესახებ ინფორმაციის ბოლო განახლების თარიღი, UTC ფორმატში (მაგ., 1422748800000 არის UTC თარიღი 2015-01-01-სთვის) <a href="http://www.w3schools.com/jsref/jsref_utc.asp" target="_blank">UTC-ს თარიღების შესახებ დამატებითი ინფორმაციის მიღება შესაძლებელია ამ ბმულზე.</a></td>
+</tr>
+</tbody>
+</table>
+<h2>მაგალითები</h2>
+<h3>მაგალითი 1</h3>
+<p>URL არის შემდეგი:</p>
+<div class="url"><a href="/en/api/v1/last_updated_date" target="_blank">https://lari.forset.ge/en/api/v1/last_updated_date</a></div>
+<pre class="brush:js;auto-links:false;toolbar:false;tab-size:2" contenteditable="false">{
+  valid: true,
+  last_updated_date: 1510205296000
+}</pre>
+<p>&nbsp;</p>')
 end
