@@ -102,7 +102,7 @@ class Rates
   end
   def self.swap(s)
     s = s.gsub(/[[:space:]]/, '').chomp.upcase
-    swap = {"RUR" => "RUB", "TRL" => "TRY", "AZM" => "AZN", "AVD" => "AUD", "UKG" => "UAH", "BYN" => "BYR"}
+    swap = {"RUR" => "RUB", "TRL" => "TRY", "AZM" => "AZN", "AVD" => "AUD", "UKG" => "UAH", "BYN" => "BYR", "YTL" => "TRY"}
     return swap.key?(s) ? swap[s] : s
   end
   def self.n(s)
@@ -609,6 +609,157 @@ class Rates
           return items
         },
         ssl: true },
+        { name: "Jaba Credit",
+          id: 23,
+          type: :other,
+          path: "http://jabacredit.ge/home",
+          parent_tag: ".currency tr:not(:first-child)",
+          child_tag: "td",
+          child_tag_count: 4,
+          position: [0, 2, 3],
+          threshold: 6,
+          cnt: 0 },
+        { name: "Giro Credit", # TODO has history
+          id: 24,
+          type: :other,
+          path: "http://girocredit.ge/currency",
+          parent_tag: ".currency tfoot tr",
+          child_tag: "td",
+          child_tag_count: 4,
+          position: [0, 2, 3],
+          threshold: 6,
+          cnt: 0 },
+        { name: "Creditor",
+          id: 25,
+          type: :other,
+          path: "http://creditor.ge/",
+          parent_tag: ".currency .currencyTable tr",
+          child_tag: "td",
+          child_tag_count: 3,
+          position: [0, 1, 2],
+          threshold: 2,
+          cnt: 0 },
+        { name: "Intel Express", # have cross course usd eur
+          id: 26,
+          type: :other,
+          path: "http://ge.inteliexpress.net/_fragment?_path=default%3DLoading...%26_format%3Dhtml%26_locale%3Den%26_controller%3DAppBundle%253AFrontend%255CMain%253AgetCurrency&_hash=OwTnDkoRU1NuS2wjAXODMqM8OSdv8Pr9SKtjm%2BU0S4Y%3D",
+          parent_tag: "#currency tbody tr",
+          child_tag: "td",
+          child_tag_count: 4,
+          position: [1, 2, 3],
+          threshold: 5,
+          cnt: 0,
+          script:true,
+          script_callback: lambda {|script, bank|
+            items = []
+            script.each do |item|
+              c = item.css(bank[:child_tag])
+              if c.length == bank[:child_tag_count] && c[0].text == 'GEL'
+                items.push([swap(c[bank[:position][0]].text), n(c[bank[:position][1]].text), n(c[bank[:position][2]].text)])
+              end
+            end
+            return items
+          },
+        },
+        { name: "Fincredit", # have cross course usd eur
+          id: 27,
+          type: :other,
+          path: "http://fincredit.ge/",
+          parent_tag: "#t2 tbody tr",
+          child_tag: "td",
+          child_tag_count: 3,
+          position: [0, 1, 2],
+          threshold: 2,
+          cnt: 0,
+          script:true,
+          script_callback: lambda {|script, bank|
+            items = []
+
+            search_map = ['USD', 'EUR']
+
+            script.each do |item|
+              c = item.css(bank[:child_tag])
+              image = c[0].css("img").attr("src").value
+              cur = nil
+              ['competitive-icon-dollar-money-icon', 'eeeee'].each_with_index {|s, s_i|
+                (cur = search_map[s_i]; break;) unless image.index(s).nil?
+              }
+              if c.length == bank[:child_tag_count] && cur.present?
+                items.push([swap(cur), n(c[bank[:position][1]].text), n(c[bank[:position][2]].text)])
+              end
+            end
+
+            return items
+          }
+        },
+        { name: "MBC",
+          id: 28,
+          type: :other,
+          path: "http://212.72.154.50:8021/api/fxrates/mbc/commercial",
+          parent_tag: "p",
+          position: ['FromCcy', 'ToCcy', 'Buy', 'Sell'],
+          threshold: 2,
+          cnt: 0,
+          script:true,
+          script_callback: lambda {|script, bank|
+            items = []
+            rows = JSON.parse(script.text)['FXRates']
+            rows.each { |row|
+              curr = swap(row[bank[:position][0]])
+              curr_to = swap(row[bank[:position][1]])
+              if curr_to == 'GEL'
+                items.push([ curr, n(row[bank[:position][2]].to_s), n(row[bank[:position][3]].to_s)])
+              end
+            }
+            return items
+          }
+        },
+        { name: "Tbilmicrocredit",
+          id: 29,
+          type: :other,
+          path: "http://www.tbmc.ge/en/",
+          parent_tag: ".exch tbody tr",
+          child_tag: "td",
+          child_tag_count: 3,
+          position: [0, 1, 2],
+          threshold: 2,
+          cnt: 0,
+          script:true,
+          script_callback: lambda {|script, bank|
+            items = []
+            script.each do |item|
+              c = item.css(bank[:child_tag])
+              if c.length == bank[:child_tag_count] && c[0].css("img").length > 0 && c[0].css("img").attr("src").value.present?
+                cur = c[0].css("img").attr("src").value.to_s.gsub('/images/', '').gsub('.png', '').upcase
+                items.push([swap(cur), n(c[bank[:position][1]].css('span').text), n(c[bank[:position][2]].css('span').text)])
+              end
+            end
+            return items
+          }
+        },
+        { name: "Goa Credit",
+          id: 30,
+          type: :other,
+          path: "http://goacredit.ge/",
+          parent_tag: "#calcFormTabs-1 table tr",
+          child_tag: "td",
+          child_tag_count: 4,
+          position: [0, 1, 2],
+          threshold: 8,
+          cnt: 0,
+          script:true,
+          script_callback: lambda {|script, bank|
+            items = []
+            script.each do |item|
+              c = item.css(bank[:child_tag])
+              if c.length == bank[:child_tag_count] && c[0]['class'] == "currname"
+                items.push([swap(c[bank[:position][0]].text), n(c[bank[:position][1]].text), n(c[bank[:position][2]].text)])
+              end
+            end
+            return items
+          }
+        }
+
         # was turn off but corrected with same layout
         # { name: "Alpha Express",
         #   off: true,
@@ -683,9 +834,9 @@ class Rates
 
     # loop each bank, and scrape data based on array of banks options
     banks.each do |bank|
+      # next if (bank[:id] < 23) # || bank[:id] != 22
       next if bank[:id] == 1
       (is_back(bank); next;) if (bank[:off].present? && bank[:off])
-      # next if (bank[:id] != 17) # || bank[:id] != 22
       begin
         page = nil
         agent = Mechanize.new
@@ -753,6 +904,7 @@ class Rates
     end
     # loop each bank which had an exception
     banks.each do |bank|
+      # next;
       next if (bank[:id] == 1 || !bank[:e].present?)
       (next;) if (bank[:off].present? && bank[:off])
       bank.delete :e

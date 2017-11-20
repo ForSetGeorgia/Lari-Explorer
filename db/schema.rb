@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20170109071501) do
+ActiveRecord::Schema.define(:version => 20171113125348) do
 
   create_table "api_method_translations", :force => true do |t|
     t.integer  "api_method_id"
@@ -145,6 +145,13 @@ ActiveRecord::Schema.define(:version => 20170109071501) do
   add_index "rates", ["bank_id", "currency", "date"], :name => "index_rates_on_bank_id_and_currency_and_date"
   add_index "rates", ["bank_id", "currency", "utc"], :name => "index_rates_on_bank_id_and_currency_and_utc"
   add_index "rates", ["updated_at"], :name => "index_rates_on_updated_at"
+
+  create_table "tmp", :force => true do |t|
+    t.float    "buy",  :null => false
+    t.float    "sell", :null => false
+    t.datetime "date", :null => false
+    t.string   "code", :null => false
+  end
 
   create_table "users", :force => true do |t|
     t.string   "email",                  :default => "", :null => false

@@ -2,6 +2,8 @@ source 'https://rubygems.org'
 
 ruby "2.1.2"
 
+gem 'activesupport', '~> 3.2.22.5' # vulnerability https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2015-3226
+
 gem 'bundler'
 gem "rails", "3.2.18"
 gem "mysql2", "~> 0.3.21" # this gem works better with utf-8

@@ -7,7 +7,7 @@ MIBG,ProCredit Bank,პროკრედიტ ბანკი,procredit,#c6007
 CRTU,Cartu Bank,ბანკი ქართუ,cartu,#597abc,#597abc,6,0
 UGEB,VTB Bank,ვითიბი ბანკი,vtb,#303f96,#303f96,7,0
 PRSG,Progress Bank,პროგრეს ბანკი,progress,#78299d,#78299d,8,0
-KSBG,KSB,კორ სტანდარტ ბანკი,ksb,#a3c3dd,#a3c3dd,9,0
+KSBG,Terabank,ტერაბანკი,ksb,#a3c3dd,#a3c3dd,9,0
 CBAS,Basisbank,ბაზისბანკი,basis,#334cb1,#334cb1,10,0
 CPTB,Capital Bank,კაპიტალ ბანკი,capital,#dec277,#dec277,11,0
 FGEO,Finca Bank,ფინკა ბანკი,finca,#5761c2,#5761c2,12,0
@@ -20,3 +20,11 @@ RICO,Rico Credit,რიკო კრედიტი,ricocredit,#6e0099,#6e0099,1
 CRMO,Crystal Microfinance Organization,კრისტალი მიკროსაფინანსო ორგანიზაცია,crystal,#f40069,#f40069,19,1
 BOMO,Bonaco Microfinance Organization,ბონაკო მიკროსაფინანსო ორგანიზაცია,bonaco,#7dea00,#7dea00,20,1
 ALPE,Alpha Express,ალფა ექსპრესი,alfa,#ed0000,#ed0000,21,1
+JABA,Jaba Credit,ჯაბა კრედიტი,jaba,#a42991,#a42991,22,1
+GIRO,Giro Credit,გირო კრედიტი,giro,#7b973c,#7b973c,23,1
+CRED,Creditor,კრედიტორი,cred,#9ad187,#9ad187,24,1
+INTE,Intel Express,ინტელიექსპრესი,inte,#ef372e,#ef372e,25,1
+FINC,Fincredit,ფინკრედიტი,finc,#004366,#004366,26,1
+MIBC,Micro Business Capital,მიკრო ბიზნეს კაპიტალი,mibc,#d21c23,#d21c23,27,1
+TBMC,Tbilmicrocredit,თბილმიკროკრედიტი,tbmc,#d5b796,#d5b796,28,1
+GOAC,Goa Credit,გოა კრედიტი,goac,#3680d5,#3680d5,29,1
