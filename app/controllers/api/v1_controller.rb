@@ -130,14 +130,14 @@ class Api::V1Controller < ApplicationController
   # get list of commercial banks
   def commercial_banks
     data = { valid: true }
-    template = {code: nil, name: nil, currencies: nil}
+    template = {code: nil, name: nil, currencies: nil, off: false}
 
     data[:results] = []
     banks = Bank.not_nbg.sorted
     bank_currencies = Rate.currency_by_bank
     currencies = Currency.data
 
-    # for each bank, add code, name and currencies
+    # for each bank, add code, name, currencies, off state
     data[:results] = []
     banks.each do |bank|
       b = template.clone
@@ -149,6 +149,7 @@ class Api::V1Controller < ApplicationController
       bank_currencies.select{|x| x.bank_id == bank.id}.each do |currency|
         b[:currencies] << currency.currency
       end
+      b[:off] = bank.off
 
       data[:results] << b
     end
