@@ -301,8 +301,7 @@ class Rates
         id:12,
         path:"http://capitalbank.ge/en/Xml",
         parent_tag:"body" },
-      { off: true,
-        name: "Finca Bank",
+      { name: "Finca Bank",
         id:13,
         path:"http://www.finca.ge/en/",
         parent_tag:"#CT1.bcontent table tr",
@@ -658,6 +657,7 @@ class Rates
     banks.each do |bank|
       # next if (bank[:id] < 23) # || bank[:id] != 22
       next if bank[:id] == 1
+      puts "#{bank[:off].present?}#{bank[:off]}"
       (is_back(bank); next;) if (bank[:off].present? && bank[:off])
       begin
         page = nil
