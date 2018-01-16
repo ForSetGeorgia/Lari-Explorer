@@ -545,28 +545,30 @@ class Rates
           return items
         }
       },
-      { name: "Tbilmicrocredit",
+      {
+        off: true,
+        name: "Tbilmicrocredit",
         id: 29,
         type: :other,
         path: "http://www.tbmc.ge/en/",
         parent_tag: ".exch tbody tr",
-        child_tag: "td",
-        child_tag_count: 3,
-        position: [0, 1, 2],
-        threshold: 2,
-        cnt: 0,
-        script:true,
-        script_callback: lambda {|script, bank|
-          items = []
-          script.each do |item|
-            c = item.css(bank[:child_tag])
-            if c.length == bank[:child_tag_count] && c[0].css("img").length > 0 && c[0].css("img").attr("src").value.present?
-              cur = c[0].css("img").attr("src").value.to_s.gsub('/images/', '').gsub('.png', '').upcase
-              items.push([swap(cur), n(c[bank[:position][1]].css('span').text), n(c[bank[:position][2]].css('span').text)])
-            end
-          end
-          return items
-        }
+        # child_tag: "td",
+        # child_tag_count: 3,
+        # position: [0, 1, 2],
+        # threshold: 2,
+        # cnt: 0,
+        # script:true,
+        # script_callback: lambda {|script, bank|
+        #   items = []
+        #   script.each do |item|
+        #     c = item.css(bank[:child_tag])
+        #     if c.length == bank[:child_tag_count] && c[0].css("img").length > 0 && c[0].css("img").attr("src").value.present?
+        #       cur = c[0].css("img").attr("src").value.to_s.gsub('/images/', '').gsub('.png', '').upcase
+        #       items.push([swap(cur), n(c[bank[:position][1]].css('span').text), n(c[bank[:position][2]].css('span').text)])
+        #     end
+        #   end
+        #   return items
+        # }
       },
       { name: "Goa Credit",
         id: 30,
