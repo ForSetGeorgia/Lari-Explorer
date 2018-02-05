@@ -167,35 +167,39 @@ class Rates
         position:[1, 3, 4],
         threshold: 35,
         cnt:0 },
-      { name: "TBC Bank",
+      {
+        off: true,
+        name: "TBC Bank",
         id:3,
         path:"http://www.tbcbank.ge/web/en/web/guest/exchange-rates",
-        parent_tag:"div#ExchangeRates script",
-        child_tag:"",
-        child_tag_count:0,
-        position:[0, 0, 0],
-        threshold: 17,
-        cnt:0,
-        script: true,
-        script_callback: lambda {|script, bank|
-          script = script.text
-          search_phrase = 'var tbcBankRatesJSON = eval("'
-          start_index = script.index(search_phrase)
-          script = script[start_index + search_phrase.length, script.length-1]
-          end_index = script.index('")')
-          script = script[0,end_index].gsub("\\","")
-          rows = JSON.parse(script)
+        parent_tag: '#exchangeRatesSmall .view-all-btn'
+        # parent_tag:"div#ExchangeRates script",
+        # child_tag:"",
+        # child_tag_count:0,
+        # position:[0, 0, 0],
+        # threshold: 17,
+        # cnt:0,
+        # script: true,
+        # script_callback: lambda {|script, bank|
+        #   script = script.text
+        #   search_phrase = 'var tbcBankRatesJSON = eval("'
+        #   start_index = script.index(search_phrase)
+        #   script = script[start_index + search_phrase.length, script.length-1]
+        #   end_index = script.index('")')
+        #   script = script[0,end_index].gsub("\\","")
+        #   rows = JSON.parse(script)
 
-          items = []
-          rows.each { |row|
-            curr = swap(row["currencyCode"])
-            if curr != 'GEL'
-              c = row["refRates"].select{|x| x["refCurrencyCode"] == 'GEL'}.first
-              items.push([ curr, n(c["buyRate"].to_s), n(c["sellRate"].to_s)]) if c.present?
-            end
-          }
-          return items
-        } },
+        #   items = []
+        #   rows.each { |row|
+        #     curr = swap(row["currencyCode"])
+        #     if curr != 'GEL'
+        #       c = row["refRates"].select{|x| x["refCurrencyCode"] == 'GEL'}.first
+        #       items.push([ curr, n(c["buyRate"].to_s), n(c["sellRate"].to_s)]) if c.present?
+        #     end
+        #   }
+        #   return items
+        # }
+      },
        # ********** 4 - republic - now tbc, removed from scraping
       { name: "Liberty Bank",
         id:5,
@@ -659,7 +663,7 @@ class Rates
     banks.each do |bank|
       # next if (bank[:id] < 23) # || bank[:id] != 22
       next if bank[:id] == 1
-      puts "#{bank[:off].present?}#{bank[:off]}"
+      #puts "#{bank[:off].present?}#{bank[:off]}"
       (is_back(bank); next;) if (bank[:off].present? && bank[:off])
       begin
         page = nil
