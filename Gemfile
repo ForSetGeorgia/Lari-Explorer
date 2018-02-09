@@ -35,6 +35,7 @@ gem 'gabba', '~> 1.0.1' # record api calls to google analytics
 gem "unidecoder", "~> 1.1.2" #convert utf8 to ascii for permalinks
 gem "mechanize"
 gem 'dotenv-rails', '~> 2.2', '>= 2.2.1' # environment variables
+gem 'test-unit', '~> 3.0' # for rails c on server
 
 # Gems used only for assets and not required
 # in production environments by default.
