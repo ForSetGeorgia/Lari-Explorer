@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-ruby "2.1.2"
+ruby "2.3.4"
 
 gem 'bundler'
 gem "rails", '~> 3.2.22.5' # was 3.2.18; vulnerability https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2015-3226
