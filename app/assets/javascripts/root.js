@@ -151,7 +151,7 @@ $(function () {
       return "";
     }
   };
-  var cur = { p1: {}, p2: { c: ["USD", "EUR", "GBP", "RUB"], type: 0 }, p3: { c: ["USD"], b: ["BAGA", "TBCB", "REPL", "LBRT"], type: 0 } };
+  var cur = { p1: {}, p2: { c: ["USD", "EUR", "GBP", "RUB"], type: 0 }, p3: { c: ["USD"], b: ["BAGA", "LBRT", "CRTU", "UGEB"], type: 0 } };
   // p2 type 0 none, 1 percent
   // p3 type 0 both, 1 buy, 2 sell
 

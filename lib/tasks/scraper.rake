@@ -102,7 +102,7 @@ class Rates
   end
   def self.swap(s)
     s = s.gsub(/[[:space:]]/, '').chomp.upcase
-    swap = {"RUR" => "RUB", "TRL" => "TRY", "AZM" => "AZN", "AVD" => "AUD", "UKG" => "UAH", "BYN" => "BYR"}
+    swap = {"RUR" => "RUB", "TRL" => "TRY", "AZM" => "AZN", "AVD" => "AUD", "UKG" => "UAH", "BYN" => "BYR", "YTL" => "TRY"}
     return swap.key?(s) ? swap[s] : s
   end
   def self.n(s)
@@ -141,16 +141,11 @@ class Rates
   @currencies = []
   @returned_banks = []
   def self.scrape!
-    #ActiveRecord::Base.connection.execute("truncate table rates")
     require 'json'
     @currencies = Currency.pluck(:code)
     created_at = Time.now
     date = Time.now
     puts "Scrape for #{date.to_date} at #{date}"
-
-
-    #fail_flags = { bnln:0, baga:0, tbcb:0, repl:0, lbrt:0, proc:0, cart:0, vtb:0, prog:0, tera:0, basis:0, captial:0, finca:0, halyk:0, silk:0, pasha:0, azer:0, caucasus:0 }
-    #processed_flags = { bnln:0, baga:0, tbcb:0, repl:0, lbrt:0, proc:0, cart:0, vtb:0, prog:0, tera:0, basis:0, capital:0, finca:0, halyk:0, silk:0, pasha:0, azer:0, caucasus:0 }
 
     # array of banks options for scraping
     banks = [
@@ -172,9 +167,12 @@ class Rates
         position:[1, 3, 4],
         threshold: 35,
         cnt:0 },
-      { name: "TBC Bank",
+      {
+        # off: true,
+        name: "TBC Bank",
         id:3,
         path:"http://www.tbcbank.ge/web/en/web/guest/exchange-rates",
+        # parent_tag: '#exchangeRatesSmall .view-all-btn'
         parent_tag:"div#ExchangeRates script",
         child_tag:"",
         child_tag_count:0,
@@ -200,42 +198,9 @@ class Rates
             end
           }
           return items
-        } },
-      # was turn off on 08.05.2017, merged with tbc
-      { name: "Bank Republic",
-        off: true,
-        id:4,
-        path:"https://www.br.ge/en/home",
-        parent_tag:"div.rates script" },
-      # { name: "Bank Republic",
-      #   id:4,
-      #   path:"https://www.br.ge/en/home",
-      #   parent_tag:"div.rates script",
-      #   child_tag:"",
-      #   child_tag_count:0,
-      #   position:[0, 0, 0],
-      #   threshold: 4,
-      #   cnt:0,
-      #   ssl: true,
-      #   script: true,
-      #   script_callback: lambda {|script, bank|
-      #     script = script.text
-      #     search_phrase = 'var valRates = {'
-      #     start_index = script.index(search_phrase)
-      #     script = script[start_index + search_phrase.length-1, script.length-1]
-      #     end_index = script.index('};')
-      #     script = script[0,end_index+1].gsub(/[[:space:]]/, '')[0..-3] + "}"
-      #     rows = JSON.parse(script)
-
-      #     items = []
-      #     rows.keys.each do |row|
-      #       curr = swap(row)
-      #       if curr != 'GEL'
-      #         items.push([ curr, n(rows[row]["kas"]["buy"].to_s), n(rows[row]["kas"]["sell"].to_s)])
-      #       end
-      #     end
-      #     return items
-      #   } },
+        }
+      },
+       # ********** 4 - republic - now tbc, removed from scraping
       { name: "Liberty Bank",
         id:5,
         path:"https://libertybank.ge/en/pizikuri-pirebistvis",
@@ -248,16 +213,30 @@ class Rates
         ssl: true },
       { name: "ProCredit Bank",
         id:6,
-        path:"http://www.procreditbank.ge/",
-        parent_tag: lambda { |page|
-          return page.css('tr#right_table1 td.valuta').first.parent.parent.css("> tr")
-        },
-        child_tag:"td",
+        path:"https://www.procreditbank.ge/ge/exchange",
+        parent_tag: '.exchange-oficial-rates-bl .exchange-items article.exchange-item > div',
+        child_tag: "> div",
         child_tag_count:3,
         position:[0, 1, 2],
-        threshold: 3,
-        cnt:0 },
-
+        threshold: 5,
+        cnt:0,
+        script: true,
+        script_callback: lambda {|script, bank|
+          items = []
+          script.each do |item|
+            c = item.css(bank[:child_tag])
+            curs = ['usa', 'euro', 'eng', 'rus', 'swd']
+            curs_map = {'usa' => 'USD', 'euro' => 'EUR', 'eng' => 'GBP', 'rus' => 'RUB', 'swd' => 'CHF'}
+            if c.length == bank[:child_tag_count]
+              tmp = c[0].css("img").attr("src").value.gsub('/sites/all/themes/custom/procredit/images/exchange-currencu-','').gsub('.png','')
+              if curs.index(tmp).present?
+                items.push([swap(curs_map[tmp]), n(c[bank[:position][1]].text), n(c[bank[:position][2]].text)])
+              end
+            end
+          end
+          return items
+        }
+      },
       { name: "Cartu Bank",
         id:7,
         path:"http://www.cartubank.ge/?lng=eng",
@@ -267,73 +246,29 @@ class Rates
         position:[0, 1, 2],
         threshold: 5,
         cnt:0 },
-      # 28.04.2016
-      # { name: "Cartu Bank",
-      #   id:7,
-      #   path:"http://www.cartubank.ge/?lng=eng",
-      #   parent_tag: lambda {|page|
-      #     page.css("div.block_title").each do |item|
-      #       if item.inner_text.strip == "Currency Rates (GEL)"
-      #         return item.parent.css("> table > tr")
-      #       end
-      #     end
-      #   },
-      #   child_tag:"td",
-      #   child_tag_count:4,
-      #   position:[0, 1, 2],
-      #   threshold: 5,
-      #   cnt:0 },
       { name: "VTB Bank",
         id:8,
-        path:"http://en.vtb.ge/rates/",
-        parent_tag:"#tab_con_dochki_table table tbody tr",
+        path:"https://vtb.ge/en/about-the-bank/exchange-rates",
+        parent_tag:"#currencies-current table tbody tr",
         child_tag:"td",
         child_tag_count:4,
         position:[0, 2, 3],
-        threshold: 8,
+        threshold: 7,
         cnt:0,
         script: true,
         script_callback: lambda {|script, bank|
           items = []
           script.each do |item|
             c = item.css(bank[:child_tag])
-            if(c.length == bank[:child_tag_count] && swap(c[1].css("span").text) == "GEL")
-              items.push([swap(c[bank[:position][0]].css("span").text), n(c[bank[:position][1]].text), n(c[bank[:position][2]].text)])
+            if(c.length == bank[:child_tag_count] && swap(c[1].text) == "GEL")
+              items.push([swap(c[bank[:position][0]].text), n(c[bank[:position][1]].text), n(c[bank[:position][2]].text)])
             end
           end
           return items
-        } },
-      # was turn off on 24.10.2016
-      { name: "Progress Bank",
-        off: true,
-        id:9,
-        path:"http://progressbank.ge/ge/85/",
-        parent_tag:".rates table tbody" },
-      # was turn off from 17.05.2016 to 24.05.2016 but corrected with same layout
-      # turn on 24.05.2016
-      # { name: "Progress Bank",
-      #   id:9,
-      #   path:"http://progressbank.ge/ge/85/",
-      #   parent_tag:".rates table tbody",
-      #   child_tag:"td",
-      #   child_tag_count:2,
-      #   position:[0, 0, 1],
-      #   threshold: 4,
-      #   cnt:0,
-      #   script:true,
-      #   script_callback: lambda {|script, bank|
-      #     items = []
-      #     mp = { "icon-flag_us" => "USD", "icon-flag_eu" => "EUR", "icon-flag_uk" => "GBP", "icon-flag_ru" => "RUB" }
-      #     script.css("tr").each do |item|
-      #       cur = mp[item.css("th > div").attr("class").value]
-      #       c = item.css(bank[:child_tag])
-      #       if cur.present? && c.length == bank[:child_tag_count]
-      #         items.push([swap(cur), n(c[bank[:position][1]].text), n(c[bank[:position][2]].text)])
-      #       end
-      #     end
-      #     return items
-      #   } },
-      { name: "Terabank", # previous name is ksb -> tera (http://www.ksb.ge/en/ but structure stays the same)
+        },
+        ssl: true },
+       # ********** 9 - progress - now tbc, removed from scraping
+      { name: "Terabank",
         id:10,
         path:"http://terabank.ge/ge/retail",
         parent_tag:".content script",
@@ -366,33 +301,10 @@ class Rates
         position:[0, 1, 2],
         threshold: 5,
         cnt:0 },
-        # was turn off on 28.11.2016 due domain is off
-      { name: "Capital Bank",
-        off: true,
+      { name: "Capital Bank", # ********** OFF from db - was turn off on 28.11.2016 due domain is off
         id:12,
         path:"http://capitalbank.ge/en/Xml",
         parent_tag:"body" },
-      # { name: "Capital Bank",
-      #   id:12,
-      #   path:"http://capitalbank.ge/en/Xml",
-      #   parent_tag:".curr_wrapper ul.fi",
-      #   child_tag:"li",
-      #   child_tag_count:3,
-      #   position:[0, 2, 1],
-      #   threshold: 16,
-      #   cnt:0,
-      #   script: true,
-      #   script_callback: lambda {|script, bank|
-      #     items = []
-      #     script.each do |item|
-      #       c = item.css(bank[:child_tag])
-      #       curr = swap(c[bank[:position][0]].text)
-      #       if(c.length == bank[:child_tag_count] && curr == swap(item["id"]))
-      #         items.push([curr, n(c[bank[:position][1]].text), n(c[bank[:position][2]].text)])
-      #       end
-      #     end
-      #     return items
-      #   } },
       { name: "Finca Bank",
         id:13,
         path:"http://www.finca.ge/en/",
@@ -409,18 +321,10 @@ class Rates
         child_tag:"span",
         child_tag_count:3,
         position:[0, 1, 2],
-        threshold: 4, # June 13 switched to 4 from 0, previous June 12 switched from 4 to 0 due, site currency box is broken. Email sended to bank
+        threshold: 4,
         cnt:0 },
-      # { name: "Halyk Bank",
-      #   off:true,
-      #   id:14,
-      #   path:"http://hbg.ge",
-      #   parent_tag:"#timer" },
       { name: "Silk Road Bank",
         id:15,
-        # partial_off: true, # Structure of site was not changed but actual data
-        # is not filled for currency, so threshold is set to 0, flag is used to
-        # sort it down, beacuse it takes more time than usual, was back on same date
         path:"http://www.silkroadbank.ge/eng/home",
         parent_tag:"table.currencyContainer tr",
         child_tag:"td",
@@ -428,7 +332,6 @@ class Rates
         position:[0, 1, 2],
         threshold: 4,
         cnt:0 },
-      # on date 30.05.2016
       { name: "Pasha Bank",
         id:16,
         path:"http://www.pashabank.ge/en/exchange-rates",
@@ -438,13 +341,7 @@ class Rates
         position:[0, 1, 2],
         threshold: 4,
         cnt:0 },
-      # was turn off from 17.05.2016 to 30.05.2016 but corrected with same layout
-      # { name: "Pasha Bank",
-      #   off: true,
-      #   id:16,
-      #   path:"http://www.pashabank.ge",
-      #   parent_tag:"#promoslider .slide1 .lined-h2" },
-      { name: "International Bank of Azerbaijan", # script was updated on 09.01.2017 because site was updated
+      { name: "International Bank of Azerbaijan",
         id:17,
         path:"http://www.ibaz.ge",
         parent_tag:".currency-wrap .info tbody tr",
@@ -466,58 +363,11 @@ class Rates
           end
           return items
         } },
-        # script for previous version of page structure
-        # script_callback: lambda {|script, bank|
-        #   tmpItems = []
-        #   script.css(bank[:parent_tag]).each do |item|
-        #     if item.inner_text == "USD"
-        #       tmpItems = item.parent.parent.css("> tr")
-        #       break
-        #     end
-        #   end
-        #   items = []
-        #   tmpItems.each do |item|
-        #     c = item.css(bank[:child_tag])
-        #     if c.length == bank[:child_tag_count]
-        #       items.push([swap(c[bank[:position][0]].text), n(c[bank[:position][1]].text), n(c[bank[:position][2]].text)])
-        #     end
-        #   end
-
-        #   return items } },
-      # was turn off on 15.11.2016 because of domain is off, planning to remove
-      # duplicates because exchange rate stopped changing
-      {
-        name: "Caucasus Development Bank Georgia",
+      { name: "Caucasus Development Bank Georgia", # ********** OFF from db - was turn off on 15.11.2016 because of domain is off
         id:18,
-        off: true,
         path:"http://www.cdb.ge/",
         parent_tag:"body"
       },
-      # { name: "Caucasus Development Bank Georgia",
-      #   id:18,
-      #   path:"http://www.cdb.ge/en/",
-      #   parent_tag:".exch > tbody",
-      #   child_tag:"> td",
-      #   child_tag_count:3,
-      #   position:[0, 1, 2],
-      #   threshold: 3,
-      #   cnt:0,
-      #   script:true,
-      #   script_callback: lambda {|page, bank|
-
-      #     html = page.inner_html
-      #     index = html.index("<tr>") + 4
-      #     index = html.index("<tr>", index)
-      #     rows = Nokogiri::HTML(html.insert(index, "</td></tr>")).css("tr")
-
-      #     items = []
-      #     rows.each do |item|
-      #       c = item.css(bank[:child_tag])
-      #       if c.length == bank[:child_tag_count]
-      #         items.push([swap(c[bank[:position][0]].css("img").attr("alt").value), n(c[bank[:position][1]].text), n(c[bank[:position][2]].text)])
-      #       end
-      #     end
-      #     return items } },
       { name: "Rico Credit",
         id:19,
         type: :other,
@@ -527,7 +377,7 @@ class Rates
         child_tag_count:0,
         position:[0, 0, 0],
         threshold: 9,
-        exclude: ["AZN"], # when currency is temporarily unavailable key: zero, "0" , "AMD"
+        #exclude: ["AZN"], # when currency is temporarily unavailable key: zero, "0" , "AMD"
         cnt:0,
         script: true,
         script_callback: lambda {|script, bank|
@@ -549,7 +399,7 @@ class Rates
         child_tag:"th, td",
         child_tag_count:3,
         position:[0, 1, 2],
-        threshold: 5,
+        threshold: 6,
         cnt:0 },
       { name: "Bonaco Microfinance Organization",
         id:21,
@@ -572,8 +422,7 @@ class Rates
           end
           return items
         } },
-      # on date 17.05.2016
-      { name: "Alpha Express",
+      { name: "Alpha Express", # on date 17.05.2016
         id:22,
         type: :other,
         path:"https://alpha-express.ge/en",
@@ -595,26 +444,169 @@ class Rates
           return items
         },
         ssl: true },
-        # was turn off but corrected with same layout
-        # { name: "Alpha Express",
-        #   off: true,
-        #   id:22,
-        #   type: :other,
-        #   path:"https://alpha-express.ge/ge",
-        #   parent_tag:".cards a[href='#currency']",
-        #   ssl: true },
-        # not available banks
-        #---------------ISBANK Georgia - ISBK - http://www.isbank.ge/eng/default.aspx - no currency info
-        #---------------Ziraat Bank" Tbilisi - TCZB - http://ziraatbank.ge/retail-banking-services/currency-exchange - no currency info
-        #---------------BTA Bank - http://www.bta.ge/geo/home # closed
-        #---------------Privat Bank - http://privatbank.ge/ge/ # georgian bank
-        #---------------Creditplus - http://www.creditplus.ge/?lng=eng - no currency info
-        #---------------Leader Credit - http://leadercredit.ge/ - site is in a updating stage
-        #---------------Fincredit - http://fincredit.ge/ has 2 currency but getting which is which is impossible without hard coding
-        #---------------Tbilmicrocredit http://www.tbmc.ge/en/# has currency harder to get is it worth it
+      { name: "Jaba Credit",
+        id: 23,
+        type: :other,
+        path: "http://jabacredit.ge/home",
+        parent_tag: ".currency tr:not(:first-child)",
+        child_tag: "td",
+        child_tag_count: 4,
+        position: [0, 2, 3],
+        threshold: 6,
+        cnt: 0 },
+      { name: "Giro Credit", # TODO has history
+        id: 24,
+        type: :other,
+        path: "http://girocredit.ge/currency",
+        parent_tag: ".currency tfoot tr",
+        child_tag: "td",
+        child_tag_count: 4,
+        position: [0, 2, 3],
+        threshold: 6,
+        cnt: 0 },
+      { name: "Creditor",
+        id: 25,
+        type: :other,
+        path: "http://creditor.ge/",
+        parent_tag: ".currency .currencyTable tr",
+        child_tag: "td",
+        child_tag_count: 3,
+        position: [0, 1, 2],
+        threshold: 2,
+        cnt: 0 },
+      { name: "Intel Express", # have cross course usd eur
+        id: 26,
+        type: :other,
+        path: "http://ge.inteliexpress.net/_fragment?_path=default%3DLoading...%26_format%3Dhtml%26_locale%3Den%26_controller%3DAppBundle%253AFrontend%255CMain%253AgetCurrency&_hash=OwTnDkoRU1NuS2wjAXODMqM8OSdv8Pr9SKtjm%2BU0S4Y%3D",
+        parent_tag: "#currency tbody tr",
+        child_tag: "td",
+        child_tag_count: 4,
+        position: [1, 2, 3],
+        threshold: 5,
+        cnt: 0,
+        script:true,
+        script_callback: lambda {|script, bank|
+          items = []
+          script.each do |item|
+            c = item.css(bank[:child_tag])
+            if c.length == bank[:child_tag_count] && c[0].text == 'GEL'
+              items.push([swap(c[bank[:position][0]].text), n(c[bank[:position][1]].text), n(c[bank[:position][2]].text)])
+            end
+          end
+          return items
+        },
+      },
+      { name: "Fincredit", # have cross course usd eur
+        id: 27,
+        type: :other,
+        path: "http://fincredit.ge/",
+        parent_tag: "#t2 tbody tr",
+        child_tag: "td",
+        child_tag_count: 3,
+        position: [0, 1, 2],
+        threshold: 2,
+        cnt: 0,
+        script:true,
+        script_callback: lambda {|script, bank|
+          items = []
+
+          search_map = ['USD', 'EUR']
+
+          script.each do |item|
+            c = item.css(bank[:child_tag])
+            image = c[0].css("img").attr("src").value
+            cur = nil
+            ['competitive-icon-dollar-money-icon', 'eeeee'].each_with_index {|s, s_i|
+              (cur = search_map[s_i]; break;) unless image.index(s).nil?
+            }
+            if c.length == bank[:child_tag_count] && cur.present?
+              items.push([swap(cur), n(c[bank[:position][1]].text), n(c[bank[:position][2]].text)])
+            end
+          end
+
+          return items
+        }
+      },
+      { name: "MBC",
+        id: 28,
+        type: :other,
+        path: "http://212.72.154.50:8021/api/fxrates/mbc/commercial",
+        parent_tag: "p",
+        position: ['FromCcy', 'ToCcy', 'Buy', 'Sell'],
+        threshold: 2,
+        cnt: 0,
+        script:true,
+        script_callback: lambda {|script, bank|
+          items = []
+          rows = JSON.parse(script.text)['FXRates']
+          rows.each { |row|
+            curr = swap(row[bank[:position][0]])
+            curr_to = swap(row[bank[:position][1]])
+            if curr_to == 'GEL'
+              items.push([ curr, n(row[bank[:position][2]].to_s), n(row[bank[:position][3]].to_s)])
+            end
+          }
+          return items
+        }
+      },
+      {
+        off: true,
+        name: "Tbilmicrocredit",
+        id: 29,
+        type: :other,
+        path: "http://www.tbmc.ge/en/",
+        parent_tag: ".exch tbody tr",
+        # child_tag: "td",
+        # child_tag_count: 3,
+        # position: [0, 1, 2],
+        # threshold: 2,
+        # cnt: 0,
+        # script:true,
+        # script_callback: lambda {|script, bank|
+        #   items = []
+        #   script.each do |item|
+        #     c = item.css(bank[:child_tag])
+        #     if c.length == bank[:child_tag_count] && c[0].css("img").length > 0 && c[0].css("img").attr("src").value.present?
+        #       cur = c[0].css("img").attr("src").value.to_s.gsub('/images/', '').gsub('.png', '').upcase
+        #       items.push([swap(cur), n(c[bank[:position][1]].css('span').text), n(c[bank[:position][2]].css('span').text)])
+        #     end
+        #   end
+        #   return items
+        # }
+      },
+      { name: "Goa Credit",
+        id: 30,
+        type: :other,
+        path: "http://goacredit.ge/",
+        parent_tag: "#calcFormTabs-1 table tr",
+        child_tag: "td",
+        child_tag_count: 4,
+        position: [0, 1, 2],
+        threshold: 8,
+        cnt: 0,
+        script:true,
+        script_callback: lambda {|script, bank|
+          items = []
+          script.each do |item|
+            c = item.css(bank[:child_tag])
+            if c.length == bank[:child_tag_count] && c[0]['class'] == "currname"
+              items.push([swap(c[bank[:position][0]].text), n(c[bank[:position][1]].text), n(c[bank[:position][2]].text)])
+            end
+          end
+          return items
+        }
+      }
     ]
 
-
+    banks.each{|b|
+      bnk = Bank.find(b[:id])
+      if bnk.present?
+        b[:off] = true if bnk.off
+      else
+        puts "Bank not found in db: #{b[:id]}"
+      end
+    }
+    # puts banks.map{|m| [m[:id], m[:name], m[:off]]}
     # nbg -----------------------------------------------------------------------
       begin
         bank = banks[0]
@@ -669,9 +661,10 @@ class Rates
 
     # loop each bank, and scrape data based on array of banks options
     banks.each do |bank|
+      # next if (bank[:id] < 23) # || bank[:id] != 22
       next if bank[:id] == 1
+      #puts "#{bank[:off].present?}#{bank[:off]}"
       (is_back(bank); next;) if (bank[:off].present? && bank[:off])
-      # next if (bank[:id] != 17) # || bank[:id] != 22
       begin
         page = nil
         agent = Mechanize.new
@@ -739,6 +732,7 @@ class Rates
     end
     # loop each bank which had an exception
     banks.each do |bank|
+      # next;
       next if (bank[:id] == 1 || !bank[:e].present?)
       (next;) if (bank[:off].present? && bank[:off])
       bank.delete :e
@@ -868,3 +862,217 @@ namespace :rates do
     Rates.scrape!
   end
 end
+
+
+### changelog
+
+  # removed from scraping list on 29.11.2017
+  # was turn off on 08.05.2017, merged with tbc
+  # { name: "Bank Republic",
+  #   off: true,
+  #   id:4,
+  #   path:"https://www.br.ge/en/home",
+  #   parent_tag:"div.rates script" },
+  # { name: "Bank Republic",
+  #   id:4,
+  #   path:"https://www.br.ge/en/home",
+  #   parent_tag:"div.rates script",
+  #   child_tag:"",
+  #   child_tag_count:0,
+  #   position:[0, 0, 0],
+  #   threshold: 4,
+  #   cnt:0,
+  #   ssl: true,
+  #   script: true,
+  #   script_callback: lambda {|script, bank|
+  #     script = script.text
+  #     search_phrase = 'var valRates = {'
+  #     start_index = script.index(search_phrase)
+  #     script = script[start_index + search_phrase.length-1, script.length-1]
+  #     end_index = script.index('};')
+  #     script = script[0,end_index+1].gsub(/[[:space:]]/, '')[0..-3] + "}"
+  #     rows = JSON.parse(script)
+
+  #     items = []
+  #     rows.keys.each do |row|
+  #       curr = swap(row)
+  #       if curr != 'GEL'
+  #         items.push([ curr, n(rows[row]["kas"]["buy"].to_s), n(rows[row]["kas"]["sell"].to_s)])
+  #       end
+  #     end
+  #     return items
+  #   } },
+
+
+  # removed from scraping list on 29.11.2017 merged with tbc
+  # was turn off on 24.10.2016
+  # { name: "Progress Bank",
+  #   off: true,
+  #   id:9,
+  #   path:"http://progressbank.ge/ge/85/",
+  #   parent_tag:".rates table tbody" },
+  # was turn off from 17.05.2016 to 24.05.2016 but corrected with same layout
+  # turn on 24.05.2016
+  # { name: "Progress Bank",
+  #   id:9,
+  #   path:"http://progressbank.ge/ge/85/",
+  #   parent_tag:".rates table tbody",
+  #   child_tag:"td",
+  #   child_tag_count:2,
+  #   position:[0, 0, 1],
+  #   threshold: 4,
+  #   cnt:0,
+  #   script:true,
+  #   script_callback: lambda {|script, bank|
+  #     items = []
+  #     mp = { "icon-flag_us" => "USD", "icon-flag_eu" => "EUR", "icon-flag_uk" => "GBP", "icon-flag_ru" => "RUB" }
+  #     script.css("tr").each do |item|
+  #       cur = mp[item.css("th > div").attr("class").value]
+  #       c = item.css(bank[:child_tag])
+  #       if cur.present? && c.length == bank[:child_tag_count]
+  #         items.push([swap(cur), n(c[bank[:position][1]].text), n(c[bank[:position][2]].text)])
+  #       end
+  #     end
+  #     return items
+  #   } },
+
+
+  # { name: "Capital Bank",
+  #   id:12,
+  #   path:"http://capitalbank.ge/en/Xml",
+  #   parent_tag:".curr_wrapper ul.fi",
+  #   child_tag:"li",
+  #   child_tag_count:3,
+  #   position:[0, 2, 1],
+  #   threshold: 16,
+  #   cnt:0,
+  #   script: true,
+  #   script_callback: lambda {|script, bank|
+  #     items = []
+  #     script.each do |item|
+  #       c = item.css(bank[:child_tag])
+  #       curr = swap(c[bank[:position][0]].text)
+  #       if(c.length == bank[:child_tag_count] && curr == swap(item["id"]))
+  #         items.push([curr, n(c[bank[:position][1]].text), n(c[bank[:position][2]].text)])
+  #       end
+  #     end
+  #     return items
+  #   } },
+
+
+  # 28.04.2016
+  # { name: "Cartu Bank",
+  #   id:7,
+  #   path:"http://www.cartubank.ge/?lng=eng",
+  #   parent_tag: lambda {|page|
+  #     page.css("div.block_title").each do |item|
+  #       if item.inner_text.strip == "Currency Rates (GEL)"
+  #         return item.parent.css("> table > tr")
+  #       end
+  #     end
+  #   },
+  #   child_tag:"td",
+  #   child_tag_count:4,
+  #   position:[0, 1, 2],
+  #   threshold: 5,
+  #   cnt:0 },
+
+  # { name: "Terabank", # previous name is ksb -> tera (http://www.ksb.ge/en/ but structure stays the same)
+
+  # { name: "Halyk Bank",
+  #   off:true,
+  #   id:14,
+  #   path:"http://hbg.ge",
+  #   parent_tag:"#timer" },
+  # threshold June 13 switched to 4 from 0, previous June 12 switched from 4 to 0 due, site currency box is broken. Email sended to bank
+
+
+  # { name: "Silk Road Bank",
+  #   id:15,
+    # partial_off: true, # Structure of site was not changed but actual data
+    # is not filled for currency, so threshold is set to 0, flag is used to
+    # sort it down, beacuse it takes more time than usual, was back on same date
+
+    # on date 30.05.2016
+    # { name: "Pasha Bank",
+    #   id:16,
+    #   path:"http://www.pashabank.ge/en/exchange-rates",
+    #   parent_tag:".exchange1 table tbody tr",
+    #   child_tag:"td",
+    #   child_tag_count:3,
+    #   position:[0, 1, 2],
+    #   threshold: 4,
+    #   cnt:0 },
+    # was turn off from 17.05.2016 to 30.05.2016 but corrected with same layout
+    # { name: "Pasha Bank",
+    #   off: true,
+    #   id:16,
+    #   path:"http://www.pashabank.ge",
+    #   parent_tag:"#promoslider .slide1 .lined-h2" },
+
+    # { name: "International Bank of Azerbaijan", # script was updated on 09.01.2017 because site was updated
+    # script for previous version of page structure
+    # script_callback: lambda {|script, bank|
+    #   tmpItems = []
+    #   script.css(bank[:parent_tag]).each do |item|
+    #     if item.inner_text == "USD"
+    #       tmpItems = item.parent.parent.css("> tr")
+    #       break
+    #     end
+    #   end
+    #   items = []
+    #   tmpItems.each do |item|
+    #     c = item.css(bank[:child_tag])
+    #     if c.length == bank[:child_tag_count]
+    #       items.push([swap(c[bank[:position][0]].text), n(c[bank[:position][1]].text), n(c[bank[:position][2]].text)])
+    #     end
+    #   end
+
+    #   return items } },
+
+    # was turn off on 15.11.2016 because of domain is off, planning to remove
+    # duplicates because exchange rate stopped changing
+    # { name: "Caucasus Development Bank Georgia",
+    #   id:18,
+    #   path:"http://www.cdb.ge/en/",
+    #   parent_tag:".exch > tbody",
+    #   child_tag:"> td",
+    #   child_tag_count:3,
+    #   position:[0, 1, 2],
+    #   threshold: 3,
+    #   cnt:0,
+    #   script:true,
+    #   script_callback: lambda {|page, bank|
+
+    #     html = page.inner_html
+    #     index = html.index("<tr>") + 4
+    #     index = html.index("<tr>", index)
+    #     rows = Nokogiri::HTML(html.insert(index, "</td></tr>")).css("tr")
+
+    #     items = []
+    #     rows.each do |item|
+    #       c = item.css(bank[:child_tag])
+    #       if c.length == bank[:child_tag_count]
+    #         items.push([swap(c[bank[:position][0]].css("img").attr("alt").value), n(c[bank[:position][1]].text), n(c[bank[:position][2]].text)])
+    #       end
+    #     end
+    #     return items } },
+
+
+  # was turn off but corrected with same layout
+  # { name: "Alpha Express",
+  #   off: true,
+  #   id:22,
+  #   type: :other,
+  #   path:"https://alpha-express.ge/ge",
+  #   parent_tag:".cards a[href='#currency']",
+  #   ssl: true },
+  # not available banks
+  #---------------ISBANK Georgia - ISBK - http://www.isbank.ge/eng/default.aspx - no currency info
+  #---------------Ziraat Bank" Tbilisi - TCZB - http://ziraatbank.ge/retail-banking-services/currency-exchange - no currency info
+  #---------------BTA Bank - http://www.bta.ge/geo/home # closed
+  #---------------Privat Bank - http://privatbank.ge/ge/ # georgian bank
+  #---------------Creditplus - http://www.creditplus.ge/?lng=eng - no currency info
+  #---------------Leader Credit - http://leadercredit.ge/ - site is in a updating stage
+  #---------------Fincredit - http://fincredit.ge/ has 2 currency but getting which is which is impossible without hard coding
+  #---------------Tbilmicrocredit http://www.tbmc.ge/en/# has currency harder to get is it worth it

@@ -1,9 +1,9 @@
 class Bank < ActiveRecord::Base
-   translates :name, :image
+  translates :name, :image
   has_many :bank_translations, :dependent => :destroy
   has_many :rates
   accepts_nested_attributes_for :bank_translations
-  attr_accessible :id, :code, :name, :image, :bank_translations_attributes, :order, :org_type # org_type 0 bank 1 other
+  attr_accessible :id, :code, :name, :image, :bank_translations_attributes, :order, :org_type, :buy_color, :sell_color, :off # org_type 0 bank 1 other
 
   validates :code, :presence => true
   validates :name, :presence => true

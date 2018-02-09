@@ -35,6 +35,7 @@ BootstrapStarter::Application.routes.draw do
       match "/v1/calculator" => "v1#calculator", as: 'v1_calculator', :via => :get, :defaults => { :format => 'json' }
       match "/v1/errors" => "v1#errors", as: 'v1_errors', :via => :get, :defaults => { :format => 'json' }
 
+      match "/v1/last_updated_date" => "v1#last_updated_date", as: 'v1_last_updated_date', :via => :get, :defaults => { :format => 'json' }
     end
 
     # root pages
