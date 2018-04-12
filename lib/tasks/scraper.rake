@@ -430,7 +430,7 @@ class Rates
         child_tag:"td",
         child_tag_count:3,
         position:[0, 1, 2],
-        threshold: 2,
+        threshold: 4,
         cnt:0,
         script:true,
         script_callback: lambda {|script, bank|
