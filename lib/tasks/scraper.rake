@@ -235,8 +235,8 @@ class Rates
             end
           end
           return items
-        }
-      },
+        },
+        ssl: true },
       { name: "Cartu Bank",
         id:7,
         path:"http://www.cartubank.ge/?lng=eng",
