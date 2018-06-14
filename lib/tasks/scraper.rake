@@ -211,7 +211,9 @@ class Rates
         threshold: 4,
         cnt:0,
         ssl: true },
-      { name: "ProCredit Bank",
+      {
+        off: true,
+        name: "ProCredit Bank",
         id:6,
         path:"https://www.procreditbank.ge/ge/exchange",
         parent_tag: '.exchange-oficial-rates-bl .exchange-items article.exchange-item > div',
