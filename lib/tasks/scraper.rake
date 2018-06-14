@@ -217,27 +217,27 @@ class Rates
         id:6,
         path:"https://www.procreditbank.ge/ge/exchange",
         parent_tag: '.exchange-oficial-rates-bl .exchange-items article.exchange-item > div',
-        child_tag: "> div",
-        child_tag_count:3,
-        position:[0, 1, 2],
-        threshold: 5,
-        cnt:0,
-        script: true,
-        script_callback: lambda {|script, bank|
-          items = []
-          script.each do |item|
-            c = item.css(bank[:child_tag])
-            curs = ['usa', 'euro', 'eng', 'rus', 'swd']
-            curs_map = {'usa' => 'USD', 'euro' => 'EUR', 'eng' => 'GBP', 'rus' => 'RUB', 'swd' => 'CHF'}
-            if c.length == bank[:child_tag_count]
-              tmp = c[0].css("img").attr("src").value.gsub('/sites/all/themes/custom/procredit/images/exchange-currencu-','').gsub('.png','')
-              if curs.index(tmp).present?
-                items.push([swap(curs_map[tmp]), n(c[bank[:position][1]].text), n(c[bank[:position][2]].text)])
-              end
-            end
-          end
-          return items
-        },
+        # child_tag: "> div",
+        # child_tag_count:3,
+        # position:[0, 1, 2],
+        # threshold: 5,
+        # cnt:0,
+        # script: true,
+        # script_callback: lambda {|script, bank|
+        #   items = []
+        #   script.each do |item|
+        #     c = item.css(bank[:child_tag])
+        #     curs = ['usa', 'euro', 'eng', 'rus', 'swd']
+        #     curs_map = {'usa' => 'USD', 'euro' => 'EUR', 'eng' => 'GBP', 'rus' => 'RUB', 'swd' => 'CHF'}
+        #     if c.length == bank[:child_tag_count]
+        #       tmp = c[0].css("img").attr("src").value.gsub('/sites/all/themes/custom/procredit/images/exchange-currencu-','').gsub('.png','')
+        #       if curs.index(tmp).present?
+        #         items.push([swap(curs_map[tmp]), n(c[bank[:position][1]].text), n(c[bank[:position][2]].text)])
+        #       end
+        #     end
+        #   end
+        #   return items
+        # },
         ssl: true },
       { name: "Cartu Bank",
         id:7,
