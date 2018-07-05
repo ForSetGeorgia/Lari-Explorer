@@ -250,7 +250,7 @@ class Rates
         cnt:0 },
       { name: "VTB Bank",
         id:8,
-        path:"https://vtb.ge/en/about-the-bank/exchange-rates",
+        path:"https://vtb.ge/en/individuals/exchange-rates",
         parent_tag:"#currencies-current table tbody tr",
         child_tag:"td",
         child_tag_count:4,
