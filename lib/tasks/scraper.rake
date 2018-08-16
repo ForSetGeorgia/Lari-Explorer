@@ -345,26 +345,28 @@ class Rates
         cnt:0 },
       { name: "International Bank of Azerbaijan",
         id:17,
+        off: true,
         path:"http://www.ibaz.ge",
         parent_tag:".currency-wrap .info tbody tr",
-        child_tag:"td",
-        child_tag_count:4,
-        position:[0, 1, 2],
-        threshold: 4,
-        cnt:0,
-        script: true,
-        script_callback: lambda {|script, bank|
-          items = []
-          script.each do |item|
-            c = item.css(bank[:child_tag])
-            items.push([
-              swap(c[bank[:position][0]].css('i').attr('class').to_s.gsub('icon-','')),
-              n(c[bank[:position][1]].text),
-              n(c[bank[:position][2]].text)]
-            )
-          end
-          return items
-        } },
+        # child_tag:"td",
+        # child_tag_count:4,
+        # position:[0, 1, 2],
+        # threshold: 4,
+        # cnt:0,
+        # script: true,
+        # script_callback: lambda {|script, bank|
+        #   items = []
+        #   script.each do |item|
+        #     c = item.css(bank[:child_tag])
+        #     items.push([
+        #       swap(c[bank[:position][0]].css('i').attr('class').to_s.gsub('icon-','')),
+        #       n(c[bank[:position][1]].text),
+        #       n(c[bank[:position][2]].text)]
+        #     )
+        #   end
+        #   return items
+        # }
+      },
       { name: "Caucasus Development Bank Georgia", # ********** OFF from db - was turn off on 15.11.2016 because of domain is off
         id:18,
         path:"http://www.cdb.ge/",
@@ -459,12 +461,12 @@ class Rates
       { name: "Giro Credit", # TODO has history
         id: 24,
         type: :other,
-        path: "http://girocredit.ge/currency",
-        parent_tag: ".currency tfoot tr",
+        path: "http://girocredit.ge/currencies/",
+        parent_tag: ".currency_rates_table tr",
         child_tag: "td",
         child_tag_count: 4,
-        position: [0, 2, 3],
-        threshold: 6,
+        position: [0, 1, 2],
+        threshold: 5,
         cnt: 0 },
       { name: "Creditor",
         id: 25,
