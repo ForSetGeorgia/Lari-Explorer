@@ -466,7 +466,7 @@ class Rates
         child_tag: "td",
         child_tag_count: 4,
         position: [0, 1, 2],
-        threshold: 5,
+        threshold: 6,
         cnt: 0 },
       { name: "Creditor",
         id: 25,
