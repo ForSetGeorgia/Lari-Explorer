@@ -310,13 +310,29 @@ class Rates
         parent_tag:"body" },
       { name: "Finca Bank",
         id:13,
-        path:"http://www.finca.ge/en/",
-        parent_tag:"#CT1.bcontent table tr",
+        path:"https://www.finca.ge/en/",
+        parent_tag:".fusion-column-wrapper > table",
         child_tag:"td",
         child_tag_count:3,
         position:[0, 1, 2],
         threshold: 2,
-        cnt:0 },
+        cnt:0,
+        script: true,
+        script_callback: lambda {|script, bank|
+          items = []
+          curs = ['USD', 'EUR']
+
+          if script.css('>tr>td:nth-child(1)>table>tr:nth-child(2)>td:nth-child(1):contains("USD")').length == 1 && script.css('>tr>td:nth-child(1)>table>tr:nth-child(3)>td:nth-child(1):contains("EUR")').length == 1
+            data = script.css('>tr>td:nth-child(2)>table>tr')
+            data.each_with_index{|d, d_i|
+              if d_i != 0
+                items.push([swap(curs[d_i-1]), n(d.css('>td:nth-child(1)').text), n(d.css('>td:nth-child(2)').text)])
+              end
+            }
+          end
+          return items
+        },
+        ssl: true },
       { name: "Halyk Bank",
         id:14,
         path:"http://www.halykbank.ge/en",
