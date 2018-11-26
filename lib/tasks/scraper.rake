@@ -311,7 +311,7 @@ class Rates
       { name: "Finca Bank",
         id:13,
         path:"https://www.finca.ge/en/",
-        parent_tag:".fusion-column-wrapper > table",
+        parent_tag:".fusion-column-wrapper > div > table",
         child_tag:"td",
         child_tag_count:3,
         position:[0, 1, 2],
