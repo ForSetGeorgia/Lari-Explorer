@@ -205,13 +205,13 @@ class Rates
         off: true, # off on 19.12.2018 due to bank removed public exchange rates
         name: "Liberty Bank",
         id:5,
-        path:"https://libertybank.ge/en/pizikuri-pirebistvis",
-        parent_tag:"body div.box.rates table tbody tr",
-        child_tag:"th, td",
-        child_tag_count:4,
-        position:[0, 1, 2],
-        threshold: 4,
-        cnt:0,
+        path:"https://libertybank.ge/", # https://libertybank.ge/en/pizikuri-pirebistvis
+        parent_tag:".logo img", # body div.box.rates table tbody tr
+        # child_tag:"th, td",
+        # child_tag_count:4,
+        # position:[0, 1, 2],
+        # threshold: 4,
+        # cnt:0,
         ssl: true },
       {
         off: true,
