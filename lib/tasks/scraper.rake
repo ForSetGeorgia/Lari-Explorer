@@ -201,7 +201,9 @@ class Rates
         }
       },
        # ********** 4 - republic - now tbc, removed from scraping
-      { name: "Liberty Bank",
+      {
+        off: true, # off on 19.12.2018 due to bank removed public exchange rates
+        name: "Liberty Bank",
         id:5,
         path:"https://libertybank.ge/en/pizikuri-pirebistvis",
         parent_tag:"body div.box.rates table tbody tr",
