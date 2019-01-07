@@ -399,7 +399,7 @@ class Rates
         child_tag:"> div",
         child_tag_count:0,
         position:[0, 0, 0],
-        threshold: 10,
+        threshold: 9,
         #exclude: ["AZN"], # when currency is temporarily unavailable key: zero, "0" , "AMD"
         cnt:0,
         script: true,
