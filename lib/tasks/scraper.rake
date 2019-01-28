@@ -417,7 +417,7 @@ class Rates
       { name: "Crystal Microfinance Organization",
         id:20,
         type: :other,
-        path:"http://crystal.ge/en/",
+        path:"https://crystal.ge/en/",
         parent_tag:".currency-content.crystal tbody tr",
         child_tag:"th, td",
         child_tag_count:3,
