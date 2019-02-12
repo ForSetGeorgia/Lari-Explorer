@@ -424,27 +424,29 @@ class Rates
         position:[0, 1, 2],
         threshold: 6,
         cnt:0 },
-      { name: "Bonaco Microfinance Organization",
+      {
+        name: "Bonaco Microfinance Organization",  # ********** OFF from db - was turn off on 2019-02-12 because of domain is off
         id:21,
         type: :other,
         path:"http://bonaco.ge/",
-        parent_tag:"#currency_tablo ul",
-        child_tag:".cur_title span, .cur_number span",
-        child_tag_count:3,
-        position:[0, 1, 2],
-        threshold: 7,
-        cnt:0,
-        script:true,
-        script_callback: lambda {|script, bank|
-          items = []
-          script.css("li").each do |item|
-            c = item.css(bank[:child_tag])
-            if c.length == bank[:child_tag_count]
-              items.push([swap(c[bank[:position][0]].text), n(c[bank[:position][1]].text), n(c[bank[:position][2]].text)])
-            end
-          end
-          return items
-        } },
+        # parent_tag:"#currency_tablo ul",
+        # child_tag:".cur_title span, .cur_number span",
+        # child_tag_count:3,
+        # position:[0, 1, 2],
+        # threshold: 7,
+        # cnt:0,
+        # script:true,
+        # script_callback: lambda {|script, bank|
+        #   items = []
+        #   script.css("li").each do |item|
+        #     c = item.css(bank[:child_tag])
+        #     if c.length == bank[:child_tag_count]
+        #       items.push([swap(c[bank[:position][0]].text), n(c[bank[:position][1]].text), n(c[bank[:position][2]].text)])
+        #     end
+        #   end
+        #   return items
+        # }
+      },
       { name: "Alpha Express", # on date 17.05.2016
         id:22,
         type: :other,
