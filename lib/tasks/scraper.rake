@@ -414,16 +414,17 @@ class Rates
             end
           end
           return items } },
-      { name: "Crystal Microfinance Organization",
+      { name: "Crystal Microfinance Organization", # ********** OFF from db - was turn off on 2019-03-04 because site changed and do not have time to update
         id:20,
         type: :other,
         path:"https://crystal.ge/en/",
-        parent_tag:".currency-content.crystal tbody tr",
-        child_tag:"th, td",
-        child_tag_count:3,
-        position:[0, 1, 2],
-        threshold: 6,
-        cnt:0 },
+        # parent_tag:".currency-content.crystal tbody tr",
+        # child_tag:"th, td",
+        # child_tag_count:3,
+        # position:[0, 1, 2],
+        # threshold: 6,
+        # cnt:0
+      },
       {
         name: "Bonaco Microfinance Organization",  # ********** OFF from db - was turn off on 2019-02-12 because of domain is off
         id:21,
